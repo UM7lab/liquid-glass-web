@@ -1,0 +1,23 @@
+{
+  "grid": {
+    "mean": 0.584,
+    "p99": 5.0,
+    "straight_edge_mean": 0.49
+  },
+  "colors": {
+    "mean": 0.095,
+    "p99": 1.0,
+    "straight_edge_mean": 0.176
+  },
+  "white": {
+    "mean": 0.004,
+    "p99": 0.0,
+    "straight_edge_mean": 0.046
+  },
+  "dark": {
+    "mean": 0.002,
+    "p99": 0.0,
+    "straight_edge_mean": 0.026
+  },
+  "browser": "158.0.8127.38"
+}

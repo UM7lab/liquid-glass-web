@@ -1,0 +1,6 @@
+node_modules/
+.local/
+*.tsbuildinfo
+.ruff_cache/
+__pycache__/
+*.pyc

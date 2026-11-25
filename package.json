@@ -1,0 +1,44 @@
+{
+  "name": "liquid-glass-web",
+  "version": "0.1.0",
+  "description": "Adjustable neutral glass for web surfaces, ported from render revision 3.2.",
+  "type": "module",
+  "license": "MIT",
+  "repository": "github:UM7lab/liquid-glass-web",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "README.zh-CN.md",
+    "NOTICE",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc && node build.mjs",
+    "test": "node --test tests/optics.test.mjs"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.27",
+    "esbuild": "0.25.12",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "5.8.3"
+  },
+  "peerDependencies": {
+    "react": ">=17"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}

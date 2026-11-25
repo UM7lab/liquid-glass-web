@@ -1,0 +1,164 @@
+<!doctype html><meta charset="utf-8" /><style>
+  * {
+    box-sizing: border-box;
+  }
+  html,
+  body {
+    margin: 0;
+    background: #15252b;
+  }
+  #stage {
+    position: relative;
+    isolation: isolate;
+    width: 480px;
+    height: 280px;
+  }
+  #bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .panel {
+    position: absolute;
+    inset: 32px;
+  }
+  .bench #stage {
+    width: 100vw;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+  .bench {
+    height: 170vh;
+  }
+  .bench .panel {
+    inset: auto;
+    width: 25vw;
+    height: 24vh;
+    border-radius: 32px;
+  }
+  .bench .panel:nth-of-type(3n + 1) {
+    left: 5%;
+  }
+  .bench .panel:nth-of-type(3n + 2) {
+    left: 37.5%;
+  }
+  .bench .panel:nth-of-type(3n) {
+    left: 70%;
+  }
+  .bench .panel:nth-of-type(-n + 3) {
+    top: 16%;
+  }
+  .bench .panel:nth-of-type(n + 4) {
+    top: 57%;
+  }
+</style>
+<div id="stage"><canvas id="bg" width="480" height="280"></canvas></div>
+<script type="module">
+  import { LiquidGlass } from '../dist/index.js'
+  const bg = document.querySelector('#bg'),
+    stage = document.querySelector('#stage')
+  const ctx = bg.getContext('2d', { alpha: false }),
+    q = new URLSearchParams(location.search)
+  const bench = q.has('bench'),
+    mode = q.get('mode') || 'webgl2',
+    count = Number(q.get('count') || 1),
+    img = new Image()
+  img.src = '../docs/fixtures/' + (q.get('scene') || 'grid') + '.png'
+  await img.decode()
+  if (bench) {
+    document.body.classList.add('bench')
+    bg.width = innerWidth
+    bg.height = innerHeight
+  }
+  function paint(shift) {
+    const w = bg.width,
+      h = bg.height
+    ctx.drawImage(img, shift, 0, w, h)
+    if (shift) ctx.drawImage(img, shift - w, 0, w, h)
+  }
+  paint(0)
+  if (mode === 'legacy' || q.has('ambient')) {
+    const css = document.createElement('link')
+    css.rel = 'stylesheet'
+    css.href = '/baseline/style.css'
+    await new Promise((resolve, reject) => {
+      css.onload = resolve
+      css.onerror = reject
+      css.href = '/baseline/style.css'
+      document.head.append(css)
+    })
+    if (q.has('ambient')) {
+      const drift = document.createElement('div')
+      drift.className = 'aurora-bg'
+      drift.style.cssText = 'position:absolute;inset:0'
+      stage.append(drift)
+    }
+  }
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('article')
+    el.className = 'panel' + (mode === 'legacy' ? ' aurora-glass aurora-glass--interactive' : '')
+    stage.append(el)
+  }
+  if (mode === 'legacy') {
+    const s = document.createElement('script')
+    s.src = '/baseline/legacy.js'
+    await new Promise((res, rej) => {
+      s.onload = res
+      s.onerror = rej
+      document.head.append(s)
+    })
+    window.old = new AuroraGlass.Aurora({ targets: '.panel' }).start()
+  } else if (mode !== 'bare')
+    window.glass = new LiquidGlass({
+      targets: '.panel',
+      source: mode === 'webgl2' ? bg : null,
+      material: bench ? { radius: 32 } : {},
+    }).start()
+  window.LiquidGlass = LiquidGlass
+  window.ready = true
+  window.runTrial = (duration, scenario) =>
+    new Promise((resolve) => {
+      if (scenario === 'scroll') stage.style.position = 'relative'
+      const timestamps = [],
+        tiers = {},
+        gpu = [],
+        counter = window.glass?.status,
+        begin = performance.now()
+      let lastSourceFrame = -1,
+        sourceFrames = 0
+      function tick(t) {
+        const elapsed = t - begin
+        const sourceFrame = Math.floor((elapsed * 60) / 1000)
+        if (scenario === 'motion' && lastSourceFrame !== sourceFrame) {
+          paint(Math.floor(sourceFrame * 2) % bg.width)
+          window.glass?.invalidate()
+          lastSourceFrame = sourceFrame
+          sourceFrames++
+        }
+        if (scenario === 'scroll') window.scrollTo(0, Math.round(80 * (1 + Math.sin(elapsed * 0.003))))
+        const s = window.glass?.status
+        if (s) {
+          tiers[s.quality] = (tiers[s.quality] || 0) + 1
+          if (s.gpuMs != null) gpu.push(s.gpuMs)
+        }
+        timestamps.push(t)
+        if (elapsed < duration) {
+          requestAnimationFrame(tick)
+          return
+        }
+        const end = window.glass?.status
+        resolve({
+          timestamps,
+          tiers,
+          gpu,
+          sourceFrames,
+          draws: end ? end.frames - counter.frames : null,
+          uploads: end ? end.uploads - counter.uploads : null,
+          mode: end?.mode ?? mode,
+        })
+      }
+      requestAnimationFrame(tick)
+    })
+</script>

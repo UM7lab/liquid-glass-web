@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Liquid Glass Web · Material study</title
+  ><link rel="stylesheet" href="style.css" />
+  <header>
+    <a href="../">Liquid Glass Web</a><span>Material study / 3.2</span
+    ><a href="https://github.com/UM7lab/liquid-glass-web">GitHub ↗</a>
+  </header>
+  <main>
+    <section class="stage" aria-label="Interactive glass preview">
+      <canvas id="source" width="1200" height="840"></canvas>
+      <article class="sample">
+        <span class="caption">OPTICAL STUDY</span>
+        <h1>Liquid<br /><i>glass.</i></h1>
+        <p>Look through the edge.</p>
+      </article>
+      <div class="scene-bar">
+        <label
+          >Scene
+          <select id="scene">
+            <option>Spectrum</option>
+            <option>Grid</option>
+            <option>Daylight</option>
+            <option>Midnight</option>
+          </select></label
+        ><button id="play" aria-pressed="false">Play</button>
+      </div>
+    </section>
+    <aside>
+      <div class="panel-title">
+        <h2>Material</h2>
+        <button id="reset">Reset all</button>
+      </div>
+      <label class="mode"
+        >Background
+        <select id="mode">
+          <option value="texture">Explicit background</option>
+          <option value="page">Page backdrop</option>
+        </select></label
+      >
+      <div id="controls"></div>
+      <details>
+        <summary>Advanced optics</summary>
+        <div id="advanced"></div>
+      </details>
+      <output id="status" aria-live="polite"></output>
+    </aside>
+  </main>
+  <script type="module" src="demo.js"></script>
+</html>
