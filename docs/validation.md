@@ -44,6 +44,7 @@ Missed slots are estimated from animation-frame timestamp gaps against the measu
 ## Browser coverage
 
 - Chrome and Edge 158 passed real image and Canvas input, paused-video upload suppression, offscreen/resume, drawable HTML paint, blocked cross-origin input, lost/restored WebGL context, unavailable WebGL, React Strict Mode sharing and unmount, and the standalone script entry.
+- Firefox 146.0.1 (Playwright build) passed the ordinary-page CSS backdrop, transparent bypass and teardown checks. The published GitHub Pages editor was opened over HTTPS in Chrome and passed live switching between WebGL 2 and SVG and editing IOR.
 - Chromium at emulated 390 × 844 / DPR 3 and 800 × 550 / DPR 2 rendered the WebGL path. These checks cover layout and device scale. Physical mobile hardware, battery use and Safari remain unmeasured.
 - Performance here describes the desktop GPU and benchmark scene. The lightweight path’s per-channel tone curve and circular CSS clip can differ visibly from the full material on saturated backgrounds or at corners.
 
@@ -57,6 +58,8 @@ Install Python packages `playwright pillow numpy` and, for the Windows benchmark
 npx esbuild tests/react.jsx --bundle --outfile=.local/react-fixture.js
 python tests/browser.py --chrome "<Chrome executable>"
 python tests/sources.py --chrome "<Chrome or Edge executable>"
+python -m playwright install firefox
+python tests/firefox.py
 ```
 
 To regenerate native references on Windows with MSVC and the Liquid Glass Windows 3.2 checkout at revision `869229c`, use its original shader and blur implementation.
